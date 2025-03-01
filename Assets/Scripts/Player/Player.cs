@@ -79,7 +79,12 @@ public class Player : MonoBehaviour
         UpdateAirbornStatus();
 
         if (canBeControlled == false)
+        {
+            HandleCollision();
+            HandleAnimations();
             return;
+        }
+            
 
         if (isKnocked)
             return;
@@ -128,6 +133,22 @@ public class Player : MonoBehaviour
         Destroy(gameObject);
         GameObject newDeathVfx = Instantiate(deathVfx,transform.position,Quaternion.identity);
     }
+
+    public void Push(Vector2 direction, float duration = 0)
+    {
+        StartCoroutine(PushCouroutine(direction,duration));
+    }
+
+    private IEnumerator PushCouroutine(Vector2 direction, float duration)
+    {
+        canBeControlled = false;
+        rb.linearVelocity =Vector2.zero;
+        rb.AddForce(direction, ForceMode2D.Impulse);
+        yield return new WaitForSeconds(duration);
+
+        canBeControlled = true;
+    }
+
     private void UpdateAirbornStatus()
     {
         if (isGrounded && isAirborne)
