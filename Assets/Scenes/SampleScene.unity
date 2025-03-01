@@ -16328,7 +16328,7 @@ MonoBehaviour:
   fruitsCollected: 0
   totalFruits: 0
   canReactivate: 1
-  arrowPrefab: {fileID: 0}
+  arrowPrefab: {fileID: 8212592995376507576, guid: 6efde814a73929548b66916e2fe5ae26, type: 3}
 --- !u!4 &1512050038
 Transform:
   m_ObjectHideFlags: 0
