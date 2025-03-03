@@ -41,10 +41,15 @@ public class Player : MonoBehaviour
     [SerializeField] private Vector2 knockbackPower;
     private bool isKnocked;
 
-    [Header("Collision Info")]
+    [Header("Collision")]
     [SerializeField] private float groundCheckDistance;
     [SerializeField] private float wallCheckDistance;
     [SerializeField] private LayerMask whatIsGround;
+    [Space]
+
+    [SerializeField] private Transform enemyCheck;
+    [SerializeField] private float enemyCheckRadius;
+    [SerializeField] private LayerMask WhatIsEnemy;
     private bool isGrounded;
     private bool isAirborne;
     private bool isWallDetected;
@@ -52,7 +57,7 @@ public class Player : MonoBehaviour
     private float xInput;
     private float yInput;
 
-    private bool facingRinght = true;
+    private bool facingRight = true;
     private int facingDir = 1;
 
     [Header("VFX")]
@@ -89,6 +94,7 @@ public class Player : MonoBehaviour
         if (isKnocked)
             return;
 
+        HandleEnemyDetection();
         HandleCollision();
         HandleInput();
         HandleWallSlide();
@@ -96,6 +102,26 @@ public class Player : MonoBehaviour
         HandleFlip();
         HandleAnimations();
 
+    }
+
+    private void HandleEnemyDetection()
+    {
+        if (rb.linearVelocityY >= 0)
+        {
+            return;
+        }
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(enemyCheck.position, enemyCheckRadius,WhatIsEnemy);
+
+        foreach (var enemy in  colliders)
+        {
+            Enemy newEnemy = enemy.GetComponent<Enemy>();
+            if(newEnemy != null)
+            {
+                newEnemy.Die();
+                Jump();
+            }
+
+        }
     }
 
     public void RespawnFinished(bool finished)
@@ -297,20 +323,21 @@ public class Player : MonoBehaviour
     }
     private void HandleFlip()
     {
-        if (xInput < 0 && facingRinght || xInput > 0 && !facingRinght)
+        if (xInput < 0 && facingRight || xInput > 0 && !facingRight)
         {
             Flip();
         }
-    }
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawLine(transform.position, new Vector2(transform.position.x, transform.position.y - groundCheckDistance));
-        Gizmos.DrawLine(transform.position, new Vector2(transform.position.x + (wallCheckDistance * facingDir), transform.position.y));
     }
     public void Flip()
     {
         facingDir = facingDir * -1;
         transform.Rotate(0, 180, 0);
-        facingRinght = !facingRinght;
+        facingRight = !facingRight;
+    }
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireSphere(enemyCheck.position, enemyCheckRadius);
+        Gizmos.DrawLine(transform.position, new Vector2(transform.position.x, transform.position.y - groundCheckDistance));
+        Gizmos.DrawLine(transform.position, new Vector2(transform.position.x + (wallCheckDistance * facingDir), transform.position.y));
     }
 }
