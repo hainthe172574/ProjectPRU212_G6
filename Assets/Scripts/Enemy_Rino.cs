@@ -14,7 +14,7 @@ public class Enemy_Rino : Enemy
     protected override void Start()
     {
         base.Start();
-
+        canMove = false;
         defaultSpeed = moveSpeed;
     }
 
