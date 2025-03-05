@@ -3,6 +3,7 @@ using UnityEngine.Windows;
 
 public class Enemy : MonoBehaviour
 {
+    private SpriteRenderer sr => GetComponent<SpriteRenderer>();
     protected Animator anim;
     protected Rigidbody2D rb;
     protected Collider2D[] colliders;
@@ -11,15 +12,17 @@ public class Enemy : MonoBehaviour
 
     [Header("General info")]
     [SerializeField] protected float moveSpeed = 2f;
-    protected bool canMove;
     [SerializeField] protected float idleDuration = 1.5f;
      protected float idleTimer;
+    protected bool canMove = true;
+
 
     [Header("Death details")]
     [SerializeField] protected float deathImpactSpeed = 5;
     [SerializeField] protected float deathRotationSpeed = 150;
-    private int deathRotationDirection = 1;
+    protected int deathRotationDirection = 1;
     protected bool isDead;
+
 
 
     [Header("Basic collision")]
@@ -47,6 +50,12 @@ public class Enemy : MonoBehaviour
     protected virtual void Start()
     {
         InvokeRepeating(nameof(UpdatePlayersRef), 0, 1);
+
+        if(sr.flipX == true && !facingRight)
+        {
+            sr.flipX = false;
+            Flip();
+        }
     }
 
     private void UpdatePlayersRef()
@@ -76,9 +85,10 @@ public class Enemy : MonoBehaviour
         isDead = true;
 
         if (Random.Range(0, 100) < 50)
-        {
+        
             deathRotationDirection = deathRotationDirection * -1;
-        }
+        Destroy(gameObject, 10);
+        
     }
     private void HandleDeathRotation()
     {
@@ -106,7 +116,11 @@ public class Enemy : MonoBehaviour
         transform.Rotate(0, 180, 0);
         facingRight = !facingRight;
     }
-
+    [ContextMenu("Change Facing Direction")]
+    public void FlipDefaultFacingDirecition()
+    {
+        sr.flipX = !sr.flipX;
+    }
     protected virtual void HandleAnimator()
     {
         anim.SetFloat("xVelocity", rb.linearVelocity.x);
